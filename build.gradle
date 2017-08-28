@@ -1,0 +1,24 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'application'
+apply plugin: 'distribution'
+
+mainClassName = "Main"
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+	testCompile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.25'
+	compile group: 'postgresql', name: 'postgresql', version: '9.0-801.jdbc4'
+	testCompile group: 'com.h2database', name: 'h2', version: '1.4.196'
+	
+	
+	compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+	compile group: 'log4j', name: 'log4j', version: '1.2.17'
+    compile "com.sparkjava:spark-core:2.6.0"
+	compile group: 'com.j256.ormlite', name: 'ormlite-jdbc', version: '5.0'
+    testImplementation 'junit:junit:4.12'
+}
+
