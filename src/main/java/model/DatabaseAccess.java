@@ -39,6 +39,8 @@ public class DatabaseAccess {
 			newsDao.countOf();
 		} catch (SQLException ex) {
 			TableUtils.createTableIfNotExists(cs, News.class);
+			newsDao.executeRaw("ALTER TABLE news DROP COLUMN body;");
+			newsDao.executeRaw("ALTER TABLE news ADD COLUMN body text;");
 		}
 		try {
 			ratingDao.countOf();
