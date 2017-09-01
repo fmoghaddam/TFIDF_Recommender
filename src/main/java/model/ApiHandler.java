@@ -13,6 +13,10 @@ import java.util.concurrent.TimeUnit;
 
 import com.j256.ormlite.dao.CloseableIterator;
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.stmt.SelectArg;
+import com.j256.ormlite.stmt.Where;
 
 import main.News;
 import main.RatingFullData;
@@ -34,15 +38,16 @@ public class ApiHandler {
 	private static Object returnRecommendationForUser(String userId, Dao<News, String> newsDao, Dao<RatingFullData, String> ratingDao,
 			Dao<Similarity, String> similarityDao) {
 		try {
-			final List<RatingFullData> allRatings = ratingDao.queryForAll();
-			final List<RatingFullData> allNewsUserRate = new ArrayList<>();
 			final List<Integer> allNewsIdUserRate = new ArrayList<>();
-			for (RatingFullData r : allRatings) {
-				allNewsIdUserRate.add(r.getId());
-				if (r.getUserId() == Integer.parseInt(userId)) {
-					allNewsUserRate.add(r);
-				}
-			}
+			
+			final QueryBuilder<RatingFullData, String> queryBuilder = ratingDao.queryBuilder();
+			final Where<RatingFullData, String> where = queryBuilder.where();
+			final SelectArg selectArg = new SelectArg();
+			where.eq("userId", selectArg);
+			final PreparedQuery<RatingFullData> preparedQuery = queryBuilder.prepare();
+			selectArg.setValue(userId);
+			
+			List<RatingFullData> allNewsUserRate = ratingDao.query(preparedQuery);
 
 			final List<News> allNews = newsDao.queryForAll();
 			final Map<News, Double> result = new HashMap<>();
