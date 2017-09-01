@@ -14,10 +14,9 @@ import main.Similarity;
 
 public class DatabaseAccess {
 	private final ConnectionSource cs;
-	private static final String dbUrl = "jdbc:postgresql://127.0.0.1:5432/postgres"; 
+	private static final String dbUrl = "jdbc:postgresql://127.0.0.1:5432/postgres";
 	private static final String dbUserName = "postgres";
 	private static final String dbPassword = "postgres";
-
 
 	private final Dao<News, String> newsDao;
 	private final Dao<RatingFullData, String> ratingDao;
@@ -36,10 +35,21 @@ public class DatabaseAccess {
 	}
 
 	private void initTables() throws SQLException {
-		TableUtils.createTableIfNotExists(cs, News.class);
-		TableUtils.createTableIfNotExists(cs, RatingFullData.class);
-		TableUtils.createTableIfNotExists(cs, Similarity.class);
-
+		try {
+			newsDao.countOf();
+		} catch (SQLException ex) {
+			TableUtils.createTableIfNotExists(cs, News.class);
+		}
+		try {
+			ratingDao.countOf();
+		} catch (SQLException ex) {
+			TableUtils.createTableIfNotExists(cs, RatingFullData.class);
+		}
+		try {
+			similarityDao.countOf();
+		} catch (SQLException ex) {
+			TableUtils.createTableIfNotExists(cs, Similarity.class);
+		}
 	}
 
 	public ConnectionSource getCs() {

@@ -44,7 +44,7 @@ public class RecommenderService {
 						continue;
 					}else {
 						double sim = TFIDFCalc.calc(firstNews, secondtNews, queryForAll);
-						Similarity similarity = new Similarity();
+						final Similarity similarity = new Similarity();
 						similarity.setNews1(firstNews);
 						similarity.setNews2(secondtNews);
 						similarity.setValue(sim);
@@ -52,7 +52,7 @@ public class RecommenderService {
 					}
 				}
 			}
-		}catch(Exception e) {
+		}catch(final Exception e) {
 			e.printStackTrace();
 		}
 	}

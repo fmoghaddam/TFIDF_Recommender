@@ -22,23 +22,25 @@ import util.MapUtil;
 public class ApiHandler {
 
 	public ApiHandler(DatabaseAccess db) {
-		start(db);
+		startApis(db);
 	}
 
-	private static Object returnNews(Dao<News, String> newsDao) throws SQLException {
+	private static Object returnAllNews(Dao<News, String> newsDao) throws SQLException {
 		StringBuilder result = new StringBuilder();
 		newsDao.iterator().forEachRemaining(p -> result.append(p.toString()).append("\n"));
 		return result.toString();
 	}
 
-	private static Object returnAnswer(String userId, Dao<News, String> newsDao, Dao<RatingFullData, String> ratingDao,
+	private static Object returnRecommendationForUser(String userId, Dao<News, String> newsDao, Dao<RatingFullData, String> ratingDao,
 			Dao<Similarity, String> similarityDao) {
 		try {
 			final List<RatingFullData> allRatings = ratingDao.queryForAll();
-			final List<RatingFullData> allNewsUseRate = new ArrayList<>();
+			final List<RatingFullData> allNewsUserRate = new ArrayList<>();
+			final List<Integer> allNewsIdUserRate = new ArrayList<>();
 			for (RatingFullData r : allRatings) {
+				allNewsIdUserRate.add(r.getId());
 				if (r.getUserId() == Integer.parseInt(userId)) {
-					allNewsUseRate.add(r);
+					allNewsUserRate.add(r);
 				}
 			}
 
@@ -46,15 +48,18 @@ public class ApiHandler {
 			final Map<News, Double> result = new HashMap<>();
 			for (News n : allNews) {
 				if (TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - n.getDate().getTime()) <= 24) {
-					result.put(n, calculateRating(allNewsUseRate, similarityDao, n));
+					result.put(n, calculateRating(allNewsUserRate, similarityDao, n));
 				}
 			}
 			final Map<News, Double> sortedResult = MapUtil.sortByValueDescending(result);
-			for (News n : sortedResult.keySet()) {
-				return n;
+			final List<News> finalResult = new ArrayList<>();
+			for (final News n : sortedResult.keySet()) {
+				if(!allNewsIdUserRate.contains(n.getId())){
+					finalResult.add(n);
+				}
 			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			return finalResult;
+		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
 		return "[]";
@@ -68,6 +73,9 @@ public class ApiHandler {
 			for (RatingFullData r : allRatingsUserHas) {
 				final News news = r.getNews();
 				double sim = 0;
+				if(news.getId()==n.getId()){
+					continue;
+				}
 				if (news.getId() < n.getId()) {
 					sim = similarityDao.queryBuilder().where().eq("news1_id", news.getId()).and()
 							.eq("news2_id", n.getId()).query().get(0).getValue();
@@ -83,20 +91,17 @@ public class ApiHandler {
 				return 0;
 			}
 			return res;
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
 		return 0;
 	}
 
-	public void start(DatabaseAccess db) {
-		get("/recom/:userId", (req, res) -> returnAnswer(req.params(":userId"), db.getNewsDao(), db.getRatingDao(),
+	public void startApis(final DatabaseAccess db) {
+		get("/recom/:userId", (req, res) -> returnRecommendationForUser(req.params(":userId"), db.getNewsDao(), db.getRatingDao(),
 				db.getSimilarityDao()));
-		/**
-		 * Extra, can be removed
-		 */
-		get("/news", (req, res) -> returnNews(db.getNewsDao()));
+		
+		get("/news", (req, res) -> returnAllNews(db.getNewsDao()));
 
 		post("/rating", (req, res) -> {
 			final int userId = Integer.parseInt(req.queryParams("userId"));
@@ -136,7 +141,7 @@ public class ApiHandler {
 				db.getRatingDao().update(rating);
 			}
 			res.status(201);
-			return null;
+			return "Rating added";
 		});
 
 		post("/news", (req, res) -> {
@@ -151,7 +156,7 @@ public class ApiHandler {
 
 			db.getNewsDao().create(news);
 			res.status(201);
-			return null;
+			return "News added";
 		});
 	}
 
