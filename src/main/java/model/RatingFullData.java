@@ -1,4 +1,4 @@
-package main;
+package model;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -13,16 +13,13 @@ public class RatingFullData {
     private int userId;
     
     @DatabaseField(uniqueCombo = true , canBeNull = false, foreign = true)
-    private News news;
+    private Item Item;
     
     @DatabaseField
     private int rating;
     
     @DatabaseField
     private boolean fake;
-    
-    @DatabaseField
-    private int view;
     
     @DatabaseField
     private String personality;
@@ -39,12 +36,12 @@ public class RatingFullData {
 		this.userId = userId;
 	}
 
-	public News getNews() {
-		return news;
+	public Item getItem() {
+		return Item;
 	}
 
-	public void setNews(News news) {
-		this.news = news;
+	public void setItem(Item Item) {
+		this.Item = Item;
 	}
 
 	public int getRating() {
@@ -61,14 +58,6 @@ public class RatingFullData {
 
 	public void setFake(boolean fake) {
 		this.fake = fake;
-	}
-
-	public int getView() {
-		return view;
-	}
-
-	public void setView(int view) {
-		this.view = view;
 	}
 
 	public String getPersonality() {
@@ -89,7 +78,7 @@ public class RatingFullData {
 
 	@Override
 	public String toString() {
-		return "RatingFullData [id=" + id + ", userId=" + userId + ", news=" + news + ", rating=" + rating + ", fake="
-				+ fake + ", view=" + view + ", personality=" + personality + "]";
+		return "RatingFullData [id=" + id + ", userId=" + userId + ", Item=" + Item + ", rating=" + rating + ", fake="
+				+ fake + ", personality=" + personality + "]";
 	}
 }

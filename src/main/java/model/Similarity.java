@@ -1,4 +1,4 @@
-package main;
+package model;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -10,10 +10,10 @@ public class Similarity {
     private int id;
     
     @DatabaseField(uniqueCombo = true , canBeNull = false, foreign = true)
-    private News news1;
+    private Item item1;
     
     @DatabaseField(uniqueCombo = true , canBeNull = false, foreign = true)
-    private News news2;
+    private Item item2;
     
     @DatabaseField
     private double value;
@@ -30,20 +30,20 @@ public class Similarity {
 		this.id = id;
 	}
 
-	public News getNews1() {
-		return news1;
+	public Item getItem1() {
+		return item1;
 	}
 
-	public void setNews1(News news1) {
-		this.news1 = news1;
+	public void setItem1(Item item1) {
+		this.item1 = item1;
 	}
 
-	public News getNews2() {
-		return news2;
+	public Item getItem2() {
+		return item2;
 	}
 
-	public void setNews2(News news2) {
-		this.news2 = news2;
+	public void setItem2(Item item2) {
+		this.item2 = item2;
 	}
 
 	public double getValue() {
@@ -56,7 +56,7 @@ public class Similarity {
 
 	@Override
 	public String toString() {
-		return "Similarity [id=" + id + ", news1=" + news1 + ", news2=" + news2 + ", value=" + value + "]";
+		return "Similarity [id=" + id + ", news1=" + item1 + ", news2=" + item2 + ", value=" + value + "]";
 	}
 		
 }

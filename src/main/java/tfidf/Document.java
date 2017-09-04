@@ -3,7 +3,7 @@ package tfidf;
 import java.util.HashMap;
 import java.util.Set;
 
-import main.News;
+import model.Item;
 
 /**
  * This class represents one document.
@@ -19,34 +19,16 @@ public class Document implements Comparable<Document>{
 	 */
 	private HashMap<String, Integer> termFrequency;
 
-	/**
-	 * The name of the file to read.
-	 */
-	private News news;
+	private Item item;
 
-	/**
-	 * The constructor.
-	 * It takes in the name of a file to read.
-	 * It will read the file and pre-process it.
-	 * @param filename the name of the file
-	 */
-	public Document(News news) {
-		this.news = news;
+	public Document(Item item) {
+		this.item = item;
 		termFrequency = new HashMap<String, Integer>();
-
-		readFileAndPreProcess();
+		preProcess();
 	}
 
-	/**
-	 * This method will read in the file and do some pre-processing.
-	 * The following things are done in pre-processing:
-	 * Every word is converted to lower case.
-	 * Every character that is not a letter or a digit is removed.
-	 * We don't do any stemming.
-	 * Once the pre-processing is done, we create and update the 
-	 */
-	private void readFileAndPreProcess() {
-		String body = news.getBody();
+	private void preProcess() {
+		String body = item.getContent();
 		String[] split = body.split(" ");
 		for(int i=0;i<split.length;i++) {
 			String nextWord = split[i];
@@ -63,12 +45,6 @@ public class Document implements Comparable<Document>{
 		}
 	}
 
-	/**
-	 * This method will return the term frequency for a given word.
-	 * If this document doesn't contain the word, it will return 0
-	 * @param word The word to look for
-	 * @return the term frequency for this word in this document
-	 */
 	public double getTermFrequency(String word) {
 		if (termFrequency.containsKey(word)) {
 			return termFrequency.get(word);
@@ -77,20 +53,12 @@ public class Document implements Comparable<Document>{
 		}
 	}
 
-	/**
-	 * This method will return a set of all the terms which occur in this document.
-	 * @return a set of all terms in this document
-	 */
 	public Set<String> getTermList() {
 		return termFrequency.keySet();
 	}
 
-
-	/**
-	 * @return the filename
-	 */
-	private News getNews() {
-		return news;
+	private Item getNews() {
+		return item;
 	}
 
 	/*
@@ -99,7 +67,7 @@ public class Document implements Comparable<Document>{
 	 */
 	@Override
 	public int compareTo(Document arg0) {
-		boolean equals = news.getBody().equals(arg0.getNews().getBody());
+		boolean equals = item.getContent().equals(arg0.getNews().getContent());
 		if(equals) {
 			return 0;
 		}else {
@@ -109,7 +77,7 @@ public class Document implements Comparable<Document>{
 
 	@Override
 	public int hashCode() {
-		return news.getBody().hashCode();
+		return item.getContent().hashCode();
 	}
 
 	@Override
@@ -121,14 +89,11 @@ public class Document implements Comparable<Document>{
 		if (getClass() != obj.getClass())
 			return false;
 		Document other = (Document) obj;
-		if (news == null) {
-			if (other.news != null)
+		if (item == null) {
+			if (other.item != null)
 				return false;
-		} else if (!news.equals(other.news))
+		} else if (!item.equals(other.item))
 			return false;
 		return true;
 	}
-	
-	
-
 }

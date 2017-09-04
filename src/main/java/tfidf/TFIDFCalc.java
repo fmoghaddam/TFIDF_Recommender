@@ -3,13 +3,13 @@ package tfidf;
 import java.util.ArrayList;
 import java.util.List;
 
-import main.News;
+import model.Item;
 
 public class TFIDFCalc {
 
-	public static double calc(News n1,News n2,List<News> all) {
+	public static double calc(Item n1,Item n2,List<Item> all) {
 		ArrayList<Document> documents = new ArrayList<Document>();
-		for(News n:all) {
+		for(Item n:all) {
 			documents.add(new Document(n));
 		}
 		Corpus corpus = new Corpus(documents);

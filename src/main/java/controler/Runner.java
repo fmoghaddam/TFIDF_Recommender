@@ -1,4 +1,4 @@
-package model;
+package controler;
 
 import java.sql.SQLException;
 
@@ -9,5 +9,4 @@ public class Runner {
 		new RecommenderService(db); 
 		new ApiHandler(db);
 	}
-
 }

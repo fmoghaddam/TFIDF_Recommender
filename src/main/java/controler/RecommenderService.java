@@ -1,4 +1,4 @@
-package model;
+package controler;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -6,8 +6,8 @@ import java.util.concurrent.Executors;
 
 import com.j256.ormlite.dao.Dao;
 
-import main.News;
-import main.Similarity;
+import model.Item;
+import model.Similarity;
 import tfidf.TFIDFCalc;
 
 public class RecommenderService {
@@ -17,25 +17,25 @@ public class RecommenderService {
 	public RecommenderService(DatabaseAccess db) {
 		similarityCalculatorService.submit(() -> {
 			while (true) {
-				calculateSimilarities(db.getSimilarityDao(), db.getNewsDao());
+				calculateSimilarities(db.getSimilarityDao(), db.getItemDao());
 				Thread.sleep(DELAY_BETWEEN_EACH_RUN );
 			}
 		});
 	}
 	
-	private static void calculateSimilarities(Dao<Similarity, String> similarityDao, Dao<News, String> newsDao){
+	private static void calculateSimilarities(Dao<Similarity, String> similarityDao, Dao<Item, String> itemDao){
 		try {
-			final List<News> queryForAll = newsDao.queryForAll();
-			final News[] allNews = queryForAll.toArray(new News[0]);
+			final List<Item> queryForAll = itemDao.queryForAll();
+			final Item[] allItem = queryForAll.toArray(new Item[0]);
 
-			for(int i=0;i<allNews.length;i++) {
-				final News firstNews = allNews[i];
-				for(int j=i+1;j<allNews.length;j++) {
-					final News secondtNews = allNews[j];
+			for(int i=0;i<allItem.length;i++) {
+				final Item firstItem = allItem[i];
+				for(int j=i+1;j<allItem.length;j++) {
+					final Item secondtItem = allItem[j];
 					final List<Similarity> allSim = similarityDao.queryForAll();
 					boolean found=false;
 					for(Similarity s:allSim) {
-						if(s.getNews1().getId()==firstNews.getId() && s.getNews2().getId() == secondtNews.getId()) {
+						if(s.getItem1().getItemId()==firstItem.getItemId() && s.getItem2().getItemId() == secondtItem.getItemId()) {
 							found=true;
 							break;
 						}
@@ -43,10 +43,10 @@ public class RecommenderService {
 					if(found) {
 						continue;
 					}else {
-						double sim = TFIDFCalc.calc(firstNews, secondtNews, queryForAll);
+						double sim = TFIDFCalc.calc(firstItem, secondtItem, queryForAll);
 						final Similarity similarity = new Similarity();
-						similarity.setNews1(firstNews);
-						similarity.setNews2(secondtNews);
+						similarity.setItem1(firstItem);
+						similarity.setItem2(secondtItem);
 						similarity.setValue(sim);
 						similarityDao.create(similarity);
 					}

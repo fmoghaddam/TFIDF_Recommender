@@ -1,4 +1,4 @@
-package model;
+package controler;
 
 import java.sql.SQLException;
 
@@ -8,9 +8,10 @@ import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
-import main.News;
-import main.RatingFullData;
-import main.Similarity;
+import model.Item;
+import model.ItemView;
+import model.RatingFullData;
+import model.Similarity;
 
 public class DatabaseAccess {
 	private final ConnectionSource cs;
@@ -18,7 +19,8 @@ public class DatabaseAccess {
 	private static final String dbUserName = "postgres";
 	private static final String dbPassword = "postgres";
 
-	private final Dao<News, String> newsDao;
+	private final Dao<Item, String> itemDao;
+	private final Dao<ItemView, String> itemViewDao;
 	private final Dao<RatingFullData, String> ratingDao;
 	private final Dao<Similarity, String> similarityDao;
 
@@ -27,7 +29,8 @@ public class DatabaseAccess {
 		((JdbcConnectionSource) cs).setUsername(dbUserName);
 		((JdbcConnectionSource) cs).setPassword(dbPassword);
 
-		newsDao = DaoManager.createDao(cs, News.class);
+		itemDao = DaoManager.createDao(cs, Item.class);
+		itemViewDao = DaoManager.createDao(cs, ItemView.class);
 		ratingDao = DaoManager.createDao(cs, RatingFullData.class);
 		similarityDao = DaoManager.createDao(cs, Similarity.class);
 
@@ -36,16 +39,21 @@ public class DatabaseAccess {
 
 	private void initTables() throws SQLException {
 		try {
-			newsDao.countOf();
+			itemDao.countOf();
 		} catch (SQLException ex) {
-			TableUtils.createTableIfNotExists(cs, News.class);
-			newsDao.executeRaw("ALTER TABLE news DROP COLUMN body;");
-			newsDao.executeRaw("ALTER TABLE news ADD COLUMN body text;");
+			TableUtils.createTableIfNotExists(cs, Item.class);
+			itemDao.executeRaw("ALTER TABLE item DROP COLUMN content;");
+			itemDao.executeRaw("ALTER TABLE item ADD COLUMN content text;");
 		}
 		try {
 			ratingDao.countOf();
 		} catch (SQLException ex) {
 			TableUtils.createTableIfNotExists(cs, RatingFullData.class);
+		}
+		try {
+			itemViewDao.countOf();
+		} catch (SQLException ex) {
+			TableUtils.createTableIfNotExists(cs, ItemView.class);
 		}
 		try {
 			similarityDao.countOf();
@@ -58,10 +66,14 @@ public class DatabaseAccess {
 		return cs;
 	}
 
-	public Dao<News, String> getNewsDao() {
-		return newsDao;
+	public Dao<Item, String> getItemDao() {
+		return itemDao;
 	}
 
+	public Dao<ItemView, String> getItemViewDao() {
+		return itemViewDao;
+	}
+	
 	public Dao<RatingFullData, String> getRatingDao() {
 		return ratingDao;
 	}
